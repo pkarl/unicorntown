@@ -1,0 +1,89 @@
+body {
+    background: #000;
+    font-family: Monaco, Menlo, Courier, monospace;
+    font-size: 1.4em;
+    line-height: 1.6em;
+    background-attachment: fixed;
+    overflow-y: scroll;
+
+    color: #0a0;
+    text-shadow: 0px 0px 10px #090;
+}
+
+.gameboard {
+    width: 70%;
+    max-width: 760px;
+    margin: 0 auto;
+    background: #000;
+    padding: 0 5% 5% 5%;
+    text-align: center;
+}
+    #unicorn-form {
+
+    }
+        #unicorn-form input[type=text] {
+            background: #000;
+            border: 1px solid #090;
+            color: #0f0;
+            padding: 0.5em;
+            font-size: 1em;
+            text-transform: uppercase;
+        }
+        #unicorn-form input[type=text]:active {
+            border: none;
+        }
+
+    #unicorn-inventory {
+        text-align: left;
+        padding-bottom: 1em;
+    }
+        #unicorn-inventory p {
+            margin: 0;
+        }
+        #unicorn-inventory .item {
+            background-color: #060;
+            /*border-radius: 10px;*/
+            width: 40px;
+            height: 40px;
+            padding: 5px;
+            margin: 5px;
+            overflow: hidden;
+        }
+            #unicorn-inventory .item img {
+                width: 100%;
+                height: auto;
+            }
+
+    #unicorn-messages {
+        text-align: left;
+        padding: 0 5% 5% 5%;
+        margin-top: 2em;
+        border-left: 1px solid #030;
+        border-right: 1px solid #030;
+        overflow: hidden;
+        height: 100%;
+    }
+        #unicorn-messages p {
+            padding: 0 0 1em 0;
+            margin: 0;
+            font-size: 0.8em;
+        }
+
+        #unicorn-messages .cmd {
+            text-transform: uppercase;
+            color: #0f0;
+        }
+        #unicorn-messages .item {
+            text-transform: uppercase;
+            color: #ff0;
+        }
+        #unicorn-messages .target {
+            text-transform: uppercase;
+            color: #0ff;
+        }
+
+        #unicorn-messages p.faded, #unicorn-messages p.faded .cmd, #unicorn-messages p.faded .item, #unicorn-messages p.faded .target {
+            padding: 0;
+            color: #060;
+        }
+

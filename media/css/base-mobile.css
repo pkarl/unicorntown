@@ -1,0 +1,10 @@
+body {
+    margin: 0;
+    font-size: 18.5px;
+    line-height: 1.5em;
+    -webkit-text-size-adjust: none;
+}
+
+.gameboard {
+    width: 100%;
+}
