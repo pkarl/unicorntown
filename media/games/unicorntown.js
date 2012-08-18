@@ -146,7 +146,7 @@ window.unicorn = {
 	tick: function(command) {
 
 		// if no command was given, maybe we should just return false
-		if ( typeof command === undefined ) {
+		if ( typeof command === 'undefined' ) {
 			throw "CommandUndefinedError";
 		}
 
