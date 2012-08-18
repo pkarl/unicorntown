@@ -201,19 +201,20 @@ window.unicorn = {
 
 		$('#unicorn-form input[type=text]')[0].focus();
 		$('#unicorn-form').submit(function(event) {
-			
+
 			var command = $(this).find('input[type=text]').val();
+			command = unicorn.utils.cleanCommand(command);
 
 			event.preventDefault();
 
 			messages.find('p').addClass('faded');
 
+			$(this).find('input[type=text]').val('');
+
 			if ( command === '' ) {
 				messages.prepend("<p>Enter a command. Type <span class='cmd'>help</span> for a list of commands.</p>");
 				return;
 			}
-
-			$(this).find('input[type=text]').val('');
 
 			messages.prepend(unicorn.tick(command));
 		});
@@ -230,6 +231,17 @@ window.unicorn = {
 			_.forEach(unicorn.state.inventory, function(value, index) {
 				inventory.append("<div class='item'><img src='/media/img/" + value + ".png' alt='" + value + "'></div>");
 			});
+		},
+		cleanCommand: function(command) {
+			if (typeof command !== 'string') {
+				return '';
+			}
+			// Trim leading and trailing white space
+			command = command.replace(/^\s+|\s+$/g, '');
+			command = _.escape(command);
+			command = command.toUpperCase();
+
+			return command;
 		}
 	}
 
