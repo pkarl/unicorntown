@@ -152,7 +152,11 @@ window.unicorn = {
 
 		unicorn.utils.redrawInventory();
 
-		command = _.escape(command.toUpperCase());
+		command = unicorn.utils.cleanCommand(command);
+
+		if ( command === '' ) {
+			return "<p>Enter a command. Type <span class='cmd'>help</span> for a list of commands.</p>";
+		}
 
 		// parse command
 		var command_tokens = command.split(' ');
@@ -203,18 +207,12 @@ window.unicorn = {
 		$('#unicorn-form').submit(function(event) {
 
 			var command = $(this).find('input[type=text]').val();
-			command = unicorn.utils.cleanCommand(command);
 
 			event.preventDefault();
 
 			messages.find('p').addClass('faded');
 
 			$(this).find('input[type=text]').val('');
-
-			if ( command === '' ) {
-				messages.prepend("<p>Enter a command. Type <span class='cmd'>help</span> for a list of commands.</p>");
-				return;
-			}
 
 			messages.prepend(unicorn.tick(command));
 		});
