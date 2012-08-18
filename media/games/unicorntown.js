@@ -200,22 +200,22 @@ window.unicorn = {
 		var messages = $('#unicorn-messages');
 
 		$('#unicorn-form input[type=text]')[0].focus();
-		$('#unicorn-form').submit(function() {
+		$('#unicorn-form').submit(function(event) {
 			
 			var command = $(this).find('input[type=text]').val();
+
+			event.preventDefault();
 
 			messages.find('p').addClass('faded');
 
 			if ( command === '' ) {
 				messages.prepend("<p>Enter a command. Type <span class='cmd'>help</span> for a list of commands.</p>");
-				return false;
+				return;
 			}
 
 			$(this).find('input[type=text]').val('');
 
 			messages.prepend(unicorn.tick(command));
-			
-			return false;
 		});
 
 		// push out welcome message
