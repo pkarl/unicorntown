@@ -203,7 +203,9 @@ window.unicorn = {
 
 		var messages = $('#unicorn-messages');
 
-		$('#unicorn-form input[type=text]').trigger("focus");
+		$('#unicorn-form input[type=text]').trigger("focus")
+			// Randomize input name to prevent suggestions in modern browsers
+			.attr("name", "unicorn-command" + Math.random());
 		$('#unicorn-form').on("submit", function(event) {
 
 			var command = $(this).find('input[type=text]').val();
