@@ -10,6 +10,9 @@ window.unicorn = {
 				EAT: function(subject) {
 					unicorn.state.inventory = unicorn.state.inventory.splice(_.indexOf(unicorn.state.inventory, subject), 1);
 					return "<p>A <span class='item'>" + subject + "</span> has been eaten, and holy shit was it delicious.</p>";
+				},
+				USE: function(subject) {
+					return unicorn.items.CARROT.actions.EAT(subject);
 				}
 			}
 		},
@@ -58,13 +61,13 @@ window.unicorn = {
 			requires: function() {
 				// test for various state requirements, return true or false
 			},
-			action: function(subject) {
-				if (typeof subject === 'undefined') {
+			action: function(subjectName) {
+				if (typeof subjectName === 'undefined') {
 					return "<p>What do you want to use?</p>";
 				}
 
 				// check inventory for things...
-				var has_subject = ~_.indexOf(unicorn.state.inventory, subject);
+				var has_subject = ~_.indexOf(unicorn.state.inventory, subjectName);
 
 				if (!has_subject) {
 					return "<p>You don't have one of those. You can use these things: <span class='item'>" + unicorn.state.inventory.join("</span>, </span class='item'>") + "</span></p>";
@@ -72,11 +75,13 @@ window.unicorn = {
 
 				// TODO: check for requiremens here
 
-				console.log(unicorn, unicorn.items, unicorn.items[subject], unicorn.items[subject].actions, unicorn.items[subject].actions.USE(subject));
+				var subject = unicorn.items[subjectName];
 
-				var msg = unicorn.items[subject].actions.USE('CARROT');
+				console.log("Subject", subject);
 
-				return "<p>You use a <span class='item'>" + subject + "</span></p>" + msg; // need to replace this with parent prop. name
+				var msg = subject.actions.USE(subjectName);
+
+				return "<p>You use a <span class='item'>" + subjectName + "</span></p>" + msg; // need to replace this with parent prop. name
 			}
 		},
 		PLAY: {
