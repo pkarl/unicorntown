@@ -203,8 +203,8 @@ window.unicorn = {
 
 		var messages = $('#unicorn-messages');
 
-		$('#unicorn-form input[type=text]')[0].focus();
-		$('#unicorn-form').submit(function(event) {
+		$('#unicorn-form input[type=text]').trigger("focus");
+		$('#unicorn-form').on("submit", function(event) {
 
 			var command = $(this).find('input[type=text]').val();
 
