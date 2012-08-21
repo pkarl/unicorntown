@@ -130,6 +130,48 @@ window.unicorn = {
 
 		commands: [],
 
+		commandHistory: {
+			// Latest unsubmitted command
+			_next: "",
+			_commands: [],
+			_position: 0,
+			reset: function() {
+				var history = unicorn.state.commandHistory;
+				history._position = history._commands.length = 0;
+				history._next = "";
+			},
+			setNext: function(next) {
+				unicorn.state.commandHistory._next = next;
+			},
+			push: function(command) {
+				var history = unicorn.state.commandHistory;
+				history._commands.unshift(command);
+				history._next = "";
+			},
+			moveTo: function(newPosition) {
+				var history = unicorn.state.commandHistory;
+				var length = history._commands.length;
+
+				if (newPosition >= length) {
+					history._position = length - 1;
+				} else if (newPosition < -1) {
+				  history._position = -1;
+				} else {
+					history._position = newPosition;
+				}
+
+				if (history._position === -1) {
+					return history._next;
+				} else {
+					return history._commands[history._position];
+				}
+			},
+			moveBy: function(offset) {
+				var history = unicorn.state.commandHistory;
+				return history.moveTo(history._position + offset);
+			}
+		},
+
 		game: {
 
 			_has_sellable_item: false,
@@ -151,6 +193,9 @@ window.unicorn = {
 		}
 
 		unicorn.utils.redrawInventory();
+
+		unicorn.state.commandHistory.moveTo(-1);
+		unicorn.state.commandHistory.push(command);
 
 		command = unicorn.utils.cleanCommand(command);
 
@@ -203,7 +248,9 @@ window.unicorn = {
 
 		var messages = $('#unicorn-messages');
 
-		$('#unicorn-form input[type=text]').trigger("focus");
+		$('#unicorn-form input[type=text]').trigger("focus")
+			// Randomize input name to prevent suggestions in modern browsers
+			.attr("name", "unicorn-command" + Math.random());
 		$('#unicorn-form').on("submit", function(event) {
 
 			var command = $(this).find('input[type=text]').val();
@@ -215,6 +262,24 @@ window.unicorn = {
 			$(this).find('input[type=text]').val('');
 
 			messages.prepend(unicorn.tick(command));
+		}).on("keydown", "input[type=text]", function(event) {
+			var arrowUp = 38;
+			var arrowDown = 40;
+			var commandHistory = unicorn.state.commandHistory;
+			var recalledCommand;
+
+			if (event.which === arrowUp || event.which === arrowDown) {
+
+				if (event.which === arrowUp) {
+					recalledCommand = commandHistory.moveBy(1);
+				} else if (event.which === arrowDown) {
+					recalledCommand = commandHistory.moveBy(-1);
+				}
+
+				$(this).val(recalledCommand);
+			} else {
+				commandHistory.setNext($(this).val() + String.fromCharCode(event.which));
+			}
 		});
 
 		// push out welcome message
