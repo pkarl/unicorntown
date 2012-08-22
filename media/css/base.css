@@ -1,12 +1,12 @@
 body {
     background: #000;
     font-family: Monaco, Menlo, Courier, monospace;
-    font-size: 1.4em;
-    line-height: 1.6em;
+    font-size: 1.3em;
+    line-height: 1.4em;
     background-attachment: fixed;
     overflow-y: scroll;
 
-    color: #0a0;
+    color: #092;
     text-shadow: 0px 0px 10px #090;
 }
 
@@ -41,18 +41,14 @@ body {
             margin: 0;
         }
         #unicorn-inventory .item {
-            background-color: #060;
-            /*border-radius: 10px;*/
+            background-color: #010;
+            color: #ff0;
             width: 40px;
             height: 40px;
             padding: 5px;
             margin: 5px;
             overflow: hidden;
         }
-            #unicorn-inventory .item img {
-                width: 100%;
-                height: auto;
-            }
 
     #unicorn-messages {
         text-align: left;
@@ -82,8 +78,8 @@ body {
             color: #0ff;
         }
 
-        #unicorn-messages p.faded, #unicorn-messages p.faded .cmd, #unicorn-messages p.faded .item, #unicorn-messages p.faded .target {
+        #unicorn-messages p.faded {
             padding: 0;
-            color: #060;
+            opacity: 0.3;
         }
 
