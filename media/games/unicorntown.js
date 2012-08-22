@@ -5,10 +5,10 @@ window.unicorn = {
 		CARROT: {
 			_startswith: true,
 			value: 0,
-			description: "Mystical equines enjoy these carroty snacks.",
+			description: "Mystical equines enjoy these carroty snacks. Type <span class='cmd'>use</span> <span class='item'>carrot</span> to see what it does.",
 			actions: {
 				EAT: function(subject) {
-					unicorn.state.inventory = unicorn.state.inventory.splice(_.indexOf(unicorn.state.inventory, subject), 1);
+					unicorn.state.inventory.splice(_.indexOf(unicorn.state.inventory, subject), 1);
 					return "<p>A <span class='item'>" + subject + "</span> has been eaten, and holy shit was it delicious.</p>";
 				},
 				USE: function(subject) {
@@ -70,7 +70,7 @@ window.unicorn = {
 				var has_subject = ~_.indexOf(unicorn.state.inventory, subjectName);
 
 				if (!has_subject) {
-					return "<p>You don't have one of those. You can use these things: <span class='item'>" + unicorn.state.inventory.join("</span>, </span class='item'>") + "</span></p>";
+					return "<p>You don't have one of those." + (unicorn.state.inventory.length ? " You can use these things: <span class='item'>" + unicorn.state.inventory.join("</span>, </span class='item'>") + "</span>" : "") + "</p>";
 				}
 
 				// TODO: check for requiremens here
@@ -89,7 +89,7 @@ window.unicorn = {
 			description: "<span class='cmd'>play</span> initiates a racous playtime with the unicorn. Loads of prancing. Be careful!",
 			action: function() {
 				// change state
-				return "<p>As the unicorn bounds through a field with you, flowers are kissed with glistening sunshine radiating from its gleaming horn. It's fun.</p>";
+				return "<p>As the unicorn bounds through a field with you, flowers are kissed with glistening sunshine radiating from its gleaming horn. You have made the unicorn happy.</p>";
 			}
 		},
 		QUIT: {
@@ -192,8 +192,6 @@ window.unicorn = {
 			throw "CommandUndefinedError";
 		}
 
-		unicorn.utils.redrawInventory();
-
 		unicorn.state.commandHistory.moveTo(-1);
 		unicorn.state.commandHistory.push(command);
 
@@ -217,6 +215,8 @@ window.unicorn = {
 		message += unicorn.commands[command_tokens[0]].action(command_tokens[1]);
 
 		// check for events & spit out messaging, etc.
+
+		unicorn.utils.redrawInventory();
 
 		return message;
 	},
@@ -283,7 +283,7 @@ window.unicorn = {
 		});
 
 		// push out welcome message
-		messages.prepend("<p>Welcome to Unicorn Town! A text-based adventure that will make you wise beyond your years. Try typing <span class='cmd'>help</span> for a list of commands.</p><p>You have a <span class='item'>carrot</span></p>");
+		messages.prepend("<p>Welcome to Unicorn Town: A text-based adventure!</p><p>Type <span class='cmd'>help</span> for a list of commands.</p><p>Why don't you try playing with your unicorn by typing <span class='cmd'>play</span>?</p>");
 		unicorn.utils.redrawInventory();
 	},
 
@@ -292,7 +292,7 @@ window.unicorn = {
 			var inventory = $('#unicorn-inventory');
 			inventory.html('<p>inventory:</p>');
 			_.forEach(unicorn.state.inventory, function(value, index) {
-				inventory.append("<div class='item'><img src='/media/img/" + value + ".png' alt='" + value + "'></div>");
+				inventory.append("<span class='item'>" + value + "</span>");
 			});
 		},
 		cleanCommand: function(command) {
