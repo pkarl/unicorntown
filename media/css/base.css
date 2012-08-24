@@ -48,6 +48,8 @@ body {
             padding: 5px;
             margin: 5px;
             overflow: hidden;
+
+            text-transform: uppercase;
         }
 
     #unicorn-messages {

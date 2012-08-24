@@ -8,7 +8,7 @@ window.unicorn = {
 			description: "Mystical equines enjoy these carroty snacks. Type <span class='cmd'>use</span> <span class='item'>carrot</span> to see what it does.",
 			actions: {
 				EAT: function(subject) {
-					unicorn.state.inventory.splice(_.indexOf(unicorn.state.inventory, subject), 1);
+					unicorn.state.inventory.remove(subject);
 					return "<p>A <span class='item'>" + subject + "</span> has been eaten, and holy shit was it delicious.</p>";
 				},
 				USE: function(subject) {
@@ -45,10 +45,7 @@ window.unicorn = {
 
 				if (typeof subject === 'undefined') { subject = 'INSPECT'; }
 
-				// var has_subject = unicorn.state.commands[subject] || unicorn.state.inventory[subject];
-				var has_subject = ~_.indexOf(unicorn.state.commands, subject) || ~_.indexOf(unicorn.state.inventory, subject);
-
-				if (!has_subject) {
+				if (unicorn.state.inventory.has(subject)) {
 					return "<p>I don't know what that is.</p>";
 				}
 
@@ -66,11 +63,8 @@ window.unicorn = {
 					return "<p>What do you want to use?</p>";
 				}
 
-				// check inventory for things...
-				var has_subject = ~_.indexOf(unicorn.state.inventory, subjectName);
-
-				if (!has_subject) {
-					return "<p>You don't have one of those." + (unicorn.state.inventory.length ? " You can use these things: <span class='item'>" + unicorn.state.inventory.join("</span>, </span class='item'>") + "</span>" : "") + "</p>";
+				if (unicorn.state.inventory.has(subject)) {
+					return "<p>You don't have one of those." + (unicorn.state.inventory.items().length ? " You can use these things: <span class='item'>" + unicorn.state.inventory.items().join("</span>, </span class='item'>") + "</span>" : "") + "</p>";
 				}
 
 				// TODO: check for requiremens here
@@ -126,7 +120,47 @@ window.unicorn = {
 			cash: 0
 		},
 
-		inventory: [],
+		inventory: {
+
+			_items: [],
+
+			init: function() {
+				var inventory = unicorn.state.inventory;
+
+				// prep the inventory, etc.
+				_.forEach( unicorn.items, function(obj, key) {
+					if (obj._startswith) {
+						inventory.add(key);
+					}
+				});
+			},
+
+			reset: function() {
+				var inventory = unicorn.state.inventory;
+				inventory._items = [];
+			},
+
+			add: function(item) {
+				unicorn.state.inventory._items.push(item);
+			},
+
+			// TODO: check for presence of item before attempting to remove it
+			remove: function(item) {
+				var inventory = unicorn.state.inventory;
+				
+				return inventory._items.splice(_.indexOf(inventory._items, subject), 1);
+			},
+
+			has: function(item) {
+				// checks to see if item is in inventory, returns truthy/falsey
+				return (~_.indexOf(unicorn.state.commands, item) || ~_.indexOf(unicorn.state.inventory, item));
+			},
+
+			items: function() {
+				console.log(unicorn.state.inventory._items);
+				return unicorn.state.inventory._items;
+			}
+		},
 
 		commands: [],
 
@@ -155,7 +189,7 @@ window.unicorn = {
 				if (newPosition >= length) {
 					history._position = length - 1;
 				} else if (newPosition < -1) {
-				  history._position = -1;
+					history._position = -1;
 				} else {
 					history._position = newPosition;
 				}
@@ -224,12 +258,7 @@ window.unicorn = {
 	// defaults to '#unicorn-form', '#unicorn-messages', and '#unicorn-inventory'
 	init: function() {
 
-		// prep the inventory, etc.
-		_.forEach( unicorn.items, function(obj, key) {
-			if (obj._startswith) {
-				unicorn.state.inventory.push(key);
-			}
-		});
+		unicorn.state.inventory.init();
 
 		_.forEach( unicorn.commands, function(obj, key) {
 			if (obj._startswith) {
@@ -240,7 +269,6 @@ window.unicorn = {
 		// will probably want to do some extend/replace init state with an options obj here
 		// example: user feeds { cash: 100 } into init() to start with $100
 
-		console.log('inventory: ', unicorn.state.inventory.join(', '));
 		console.log('commands: ', unicorn.state.commands.join(', '));
 
 		// greab the elements and get the form in focus
@@ -282,7 +310,6 @@ window.unicorn = {
 			}
 		});
 
-		// push out welcome message
 		messages.prepend("<p>Welcome to Unicorn Town: A text-based adventure!</p><p>Type <span class='cmd'>help</span> for a list of commands.</p><p>Why don't you try playing with your unicorn by typing <span class='cmd'>play</span>?</p>");
 		unicorn.utils.redrawInventory();
 	},
@@ -291,7 +318,7 @@ window.unicorn = {
 		redrawInventory: function() {
 			var inventory = $('#unicorn-inventory');
 			inventory.html('<p>inventory:</p>');
-			_.forEach(unicorn.state.inventory, function(value, index) {
+			_.forEach(unicorn.state.inventory.items(), function(value, index) {
 				inventory.append("<span class='item'>" + value + "</span>");
 			});
 		},
@@ -302,7 +329,7 @@ window.unicorn = {
 			// Trim leading and trailing white space
 			command = command.replace(/^\s+|\s+$/g, '');
 			command = _.escape(command);
-			command = command.toUpperCase();
+			command = command.toUpperCase(); // this is thx to our key names being in UC
 
 			return command;
 		}
