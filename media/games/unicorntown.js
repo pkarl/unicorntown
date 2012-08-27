@@ -43,8 +43,6 @@ window.game = {
 			description: "<span class='cmd'>inspect</span> tells you more about <span class='item'>items</span> or <span class='cmd'>commands</span>. Example: <span class='cmd'>inspect</span> <span class='item'>carrot</span>. Type <span class='cmd'>help</span> for more information.",
 			action: function(subject) {
 
-				console.log('subject', typeof subject);
-
 				if (typeof subject === 'undefined') { subject = 'INSPECT'; }
 
 				if ( (!game.state.inventory.has(subject)) && ~_.indexOf(game.commands, subject) ) {
@@ -72,8 +70,6 @@ window.game = {
 				// TODO: check for requiremens here
 
 				var subject = game.items[subjectName];
-
-				console.log("Subject", subject);
 
 				var msg = subject.actions.USE(subjectName);
 
@@ -135,22 +131,25 @@ window.game = {
 						inventory.add(key);
 					}
 				});
+
+				return inventory;
 			},
 
 			reset: function() {
 				var inventory = game.state.inventory;
 				inventory._items = [];
+				return;
 			},
 
 			add: function(item) {
-				game.state.inventory._items.push(item);
+				return game.state.inventory._items.push(item);
 			},
 
 			// TODO: check for presence of item before attempting to remove it
 			remove: function(item) {
 				var inventory = game.state.inventory;
 				
-				return inventory._items.splice(_.indexOf(inventory._items, subject), 1);
+				return inventory._items.splice(_.indexOf(inventory._items, item), 1);
 			},
 
 			has: function(item) {
@@ -270,11 +269,6 @@ window.game = {
 		// will probably want to do some extend/replace init state with an options obj here
 		// example: user feeds { cash: 100 } into init() to start with $100
 
-		console.log('commands: ', game.state.commands.join(', '));
-
-		// greab the elements and get the form in focus
-		// TODO: set up messaging if any of the required bits aren't in place (form/messages/inventory) 
-
 		var messages = $('#unicorn-messages');
 
 		$('#unicorn-form input[type=text]').trigger("focus")
@@ -290,7 +284,7 @@ window.game = {
 
 			$(this).find('input[type=text]').val('');
 
-			messages.prepend(unicorn.tick(command));
+			messages.prepend(game.tick(command));
 		}).on("keydown", "input[type=text]", function(event) {
 			var arrowUp = 38;
 			var arrowDown = 40;
