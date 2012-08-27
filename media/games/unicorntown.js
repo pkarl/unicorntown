@@ -289,6 +289,7 @@ window.game = {
 			var arrowUp = 38;
 			var arrowDown = 40;
 			var commandHistory = game.state.commandHistory;
+			var $target = $(event.target);
 			var recalledCommand;
 
 			if (event.which === arrowUp || event.which === arrowDown) {
@@ -299,9 +300,22 @@ window.game = {
 					recalledCommand = commandHistory.moveBy(-1);
 				}
 
-				$(this).val(recalledCommand);
+				$target.val(recalledCommand).trigger("focus");
+
+				// Set the cursor position to the end of the field
+				$target
+					// First, unbind any previously-bound handlers in order to prevent
+					// queuing of functionally identical handlers. This is important when
+					// an arrow key is held down, issuing multiple "keydown" events
+					// without corresponding "keyup" events.
+					.off("keyup.moveCursor")
+					.on("keyup.moveCursor", function(event) {
+						if (event.target.setSelectionRange) {
+							event.target.setSelectionRange(event.target.value.length, event.target.value.length);
+						}
+					});
 			} else {
-				commandHistory.setNext($(this).val() + String.fromCharCode(event.which));
+				commandHistory.setNext($target.val() + String.fromCharCode(event.which));
 			}
 		});
 
