@@ -1,4 +1,4 @@
-window.unicorn = {
+window.game = {
 
 	items: {
 
@@ -8,11 +8,11 @@ window.unicorn = {
 			description: "Mystical equines enjoy these carroty snacks. Type <span class='cmd'>use</span> <span class='item'>carrot</span> to see what it does.",
 			actions: {
 				EAT: function(subject) {
-					unicorn.state.inventory.splice(_.indexOf(unicorn.state.inventory, subject), 1);
+					game.state.inventory.remove(subject);
 					return "<p>A <span class='item'>" + subject + "</span> has been eaten, and holy shit was it delicious.</p>";
 				},
 				USE: function(subject) {
-					return unicorn.items.CARROT.actions.EAT(subject);
+					return game.items.CARROT.actions.EAT(subject);
 				}
 			}
 		},
@@ -35,7 +35,7 @@ window.unicorn = {
 			_startswith: true,
 			description: "<span class='cmd'>help</span> shows a list of available commands",
 			action: function() {
-				return "<p>Available commands: <span class='cmd'>" + unicorn.state.commands.join(', ') + "</span></p>";
+				return "<p>Available commands: <span class='cmd'>" + game.state.commands.join(', ') + "</span></p>";
 			}
 		},
 		INSPECT: {
@@ -45,14 +45,11 @@ window.unicorn = {
 
 				if (typeof subject === 'undefined') { subject = 'INSPECT'; }
 
-				// var has_subject = unicorn.state.commands[subject] || unicorn.state.inventory[subject];
-				var has_subject = ~_.indexOf(unicorn.state.commands, subject) || ~_.indexOf(unicorn.state.inventory, subject);
-
-				if (!has_subject) {
+				if ( (!game.state.inventory.has(subject)) && ~_.indexOf(game.commands, subject) ) {
 					return "<p>I don't know what that is.</p>";
 				}
 
-				return "<p>" + (unicorn.items[subject] || unicorn.commands[subject]).description + "</p>";
+				return "<p>" + (game.items[subject] || game.commands[subject]).description + "</p>";
 			}
 		},
 		USE: {
@@ -66,18 +63,13 @@ window.unicorn = {
 					return "<p>What do you want to use?</p>";
 				}
 
-				// check inventory for things...
-				var has_subject = ~_.indexOf(unicorn.state.inventory, subjectName);
-
-				if (!has_subject) {
-					return "<p>You don't have one of those." + (unicorn.state.inventory.length ? " You can use these things: <span class='item'>" + unicorn.state.inventory.join("</span>, </span class='item'>") + "</span>" : "") + "</p>";
+				if (game.state.inventory.has(subject)) {
+					return "<p>You don't have one of those." + (game.state.inventory.items().length ? " You can use these things: <span class='item'>" + game.state.inventory.items().join("</span>, </span class='item'>") + "</span>" : "") + "</p>";
 				}
 
 				// TODO: check for requiremens here
 
-				var subject = unicorn.items[subjectName];
-
-				console.log("Subject", subject);
+				var subject = game.items[subjectName];
 
 				var msg = subject.actions.USE(subjectName);
 
@@ -102,7 +94,7 @@ window.unicorn = {
 		SELL: {
 			description: "<span class='cmd'>sell</span> allows you to exchange some <span class='item'>items</span> for money.",
 			unlock: function() {
-				return unicorn.state._has_sellable_item;
+				return game.state._has_sellable_item;
 			},
 			action: function() {
 				return "<p>You sell what?</p>";
@@ -111,7 +103,7 @@ window.unicorn = {
 		BEAT: {
 			description: "<span class='cmd'>beat</span> allows you to savage the unicorn with your bare hands.",
 			unlock: function() {
-				return ( unicorn.state._tears_sold >= 3 );
+				return ( game.state._tears_sold >= 3 );
 			},
 			action: function() {
 				return "<p>You mistreat the unicorn.</p>";
@@ -126,7 +118,49 @@ window.unicorn = {
 			cash: 0
 		},
 
-		inventory: [],
+		inventory: {
+
+			_items: [],
+
+			init: function() {
+				var inventory = game.state.inventory;
+
+				// prep the inventory, etc.
+				_.forEach( game.items, function(obj, key) {
+					if (obj._startswith) {
+						inventory.add(key);
+					}
+				});
+
+				return inventory;
+			},
+
+			reset: function() {
+				var inventory = game.state.inventory;
+				inventory._items = [];
+				return;
+			},
+
+			add: function(item) {
+				return game.state.inventory._items.push(item);
+			},
+
+			// TODO: check for presence of item before attempting to remove it
+			remove: function(item) {
+				var inventory = game.state.inventory;
+				
+				return inventory._items.splice(_.indexOf(inventory._items, item), 1);
+			},
+
+			has: function(item) {
+				// checks to see if item is in inventory, returns truthy/falsey
+				return ~_.indexOf(game.state.inventory.items(), item);
+			},
+
+			items: function() {
+				return game.state.inventory._items;
+			}
+		},
 
 		commands: [],
 
@@ -136,26 +170,26 @@ window.unicorn = {
 			_commands: [],
 			_position: 0,
 			reset: function() {
-				var history = unicorn.state.commandHistory;
+				var history = game.state.commandHistory;
 				history._position = history._commands.length = 0;
 				history._next = "";
 			},
 			setNext: function(next) {
-				unicorn.state.commandHistory._next = next;
+				game.state.commandHistory._next = next;
 			},
 			push: function(command) {
-				var history = unicorn.state.commandHistory;
+				var history = game.state.commandHistory;
 				history._commands.unshift(command);
 				history._next = "";
 			},
 			moveTo: function(newPosition) {
-				var history = unicorn.state.commandHistory;
+				var history = game.state.commandHistory;
 				var length = history._commands.length;
 
 				if (newPosition >= length) {
 					history._position = length - 1;
 				} else if (newPosition < -1) {
-				  history._position = -1;
+					history._position = -1;
 				} else {
 					history._position = newPosition;
 				}
@@ -167,7 +201,7 @@ window.unicorn = {
 				}
 			},
 			moveBy: function(offset) {
-				var history = unicorn.state.commandHistory;
+				var history = game.state.commandHistory;
 				return history.moveTo(history._position + offset);
 			}
 		},
@@ -192,10 +226,10 @@ window.unicorn = {
 			throw "CommandUndefinedError";
 		}
 
-		unicorn.state.commandHistory.moveTo(-1);
-		unicorn.state.commandHistory.push(command);
+		game.state.commandHistory.moveTo(-1);
+		game.state.commandHistory.push(command);
 
-		command = unicorn.utils.cleanCommand(command);
+		command = game.utils.cleanCommand(command);
 
 		if ( command === '' ) {
 			return "<p>Enter a command. Type <span class='cmd'>help</span> for a list of commands.</p>";
@@ -205,18 +239,18 @@ window.unicorn = {
 		var command_tokens = command.split(' ');
 
 		// if we don't know how to do it, we say so here.
-		if ( !_.has(unicorn.commands, command_tokens[0]) ) {
+		if ( !_.has(game.commands, command_tokens[0]) ) {
 			return "<p>I don\'t know how to <span class='cmd'>" + command + "</span>.</p>";
 		}
 
 		// if we DO know how to do it, let's do it!
 		var message = '';
 
-		message += unicorn.commands[command_tokens[0]].action(command_tokens[1]);
+		message += game.commands[command_tokens[0]].action(command_tokens[1]);
 
 		// check for events & spit out messaging, etc.
 
-		unicorn.utils.redrawInventory();
+		game.utils.redrawInventory();
 
 		return message;
 	},
@@ -224,27 +258,16 @@ window.unicorn = {
 	// defaults to '#unicorn-form', '#unicorn-messages', and '#unicorn-inventory'
 	init: function() {
 
-		// prep the inventory, etc.
-		_.forEach( unicorn.items, function(obj, key) {
-			if (obj._startswith) {
-				unicorn.state.inventory.push(key);
-			}
-		});
+		game.state.inventory.init();
 
-		_.forEach( unicorn.commands, function(obj, key) {
+		_.forEach( game.commands, function(obj, key) {
 			if (obj._startswith) {
-				unicorn.state.commands.push(key);
+				game.state.commands.push(key);
 			}
 		});
 
 		// will probably want to do some extend/replace init state with an options obj here
 		// example: user feeds { cash: 100 } into init() to start with $100
-
-		console.log('inventory: ', unicorn.state.inventory.join(', '));
-		console.log('commands: ', unicorn.state.commands.join(', '));
-
-		// greab the elements and get the form in focus
-		// TODO: set up messaging if any of the required bits aren't in place (form/messages/inventory) 
 
 		var messages = $('#unicorn-messages');
 
@@ -261,11 +284,11 @@ window.unicorn = {
 
 			$(this).find('input[type=text]').val('');
 
-			messages.prepend(unicorn.tick(command));
+			messages.prepend(game.tick(command));
 		}).on("keydown", "input[type=text]", function(event) {
 			var arrowUp = 38;
 			var arrowDown = 40;
-			var commandHistory = unicorn.state.commandHistory;
+			var commandHistory = game.state.commandHistory;
 			var $target = $(event.target);
 			var recalledCommand;
 
@@ -296,16 +319,15 @@ window.unicorn = {
 			}
 		});
 
-		// push out welcome message
 		messages.prepend("<p>Welcome to Unicorn Town: A text-based adventure!</p><p>Type <span class='cmd'>help</span> for a list of commands.</p><p>Why don't you try playing with your unicorn by typing <span class='cmd'>play</span>?</p>");
-		unicorn.utils.redrawInventory();
+		game.utils.redrawInventory();
 	},
 
 	utils: {
 		redrawInventory: function() {
 			var inventory = $('#unicorn-inventory');
 			inventory.html('<p>inventory:</p>');
-			_.forEach(unicorn.state.inventory, function(value, index) {
+			_.forEach(game.state.inventory.items(), function(value, index) {
 				inventory.append("<span class='item'>" + value + "</span>");
 			});
 		},
@@ -316,7 +338,7 @@ window.unicorn = {
 			// Trim leading and trailing white space
 			command = command.replace(/^\s+|\s+$/g, '');
 			command = _.escape(command);
-			command = command.toUpperCase();
+			command = command.toUpperCase(); // this is thx to our key names being in UC
 
 			return command;
 		}
