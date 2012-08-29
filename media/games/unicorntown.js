@@ -121,6 +121,7 @@ window.game = {
 		inventory: {
 
 			_items: [],
+			_cash: 0,
 
 			init: function() {
 				var inventory = game.state.inventory;
@@ -143,6 +144,14 @@ window.game = {
 
 			add: function(item) {
 				return game.state.inventory._items.push(item);
+			},
+
+			pay: function(amount) {
+				game.state.inventory._cash += amount;
+			},
+
+			getCash: function() {
+				return game.state.inventory._cash;
 			},
 
 			// TODO: check for presence of item before attempting to remove it
@@ -325,11 +334,16 @@ window.game = {
 
 	utils: {
 		redrawInventory: function() {
-			var inventory = $('#unicorn-inventory');
-			inventory.html('<p>inventory:</p>');
+			var itemList = $('#unicorn-inventory .items');
+			var formattedCash = game.state.inventory.getCash().toFixed(2);
+
+			itemList.empty();
 			_.forEach(game.state.inventory.items(), function(value, index) {
-				inventory.append("<span class='item'>" + value + "</span>");
+				itemList.append("<li class='item'>" + value + "</li>");
 			});
+
+			$("#unicorn-inventory .cash .amount")
+				.text(formattedCash);
 		},
 		cleanCommand: function(command) {
 			if (typeof command !== 'string') {
