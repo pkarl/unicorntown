@@ -63,7 +63,7 @@ window.game = {
 					return "<p>What do you want to use?</p>";
 				}
 
-				if (game.state.inventory.has(subject)) {
+				if (!game.state.inventory.has(subjectName)) {
 					return "<p>You don't have one of those." + (game.state.inventory.items().length ? " You can use these things: <span class='item'>" + game.state.inventory.items().join("</span>, </span class='item'>") + "</span>" : "") + "</p>";
 				}
 
