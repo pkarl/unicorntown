@@ -40,11 +40,20 @@ body {
         #unicorn-inventory p {
             margin: 0;
         }
+        .cash {
+            color: #0f0;
+            float: right;
+        }
+        #unicorn-inventory .items {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
         #unicorn-inventory .item {
             background-color: #010;
             color: #ff0;
-            width: 40px;
-            height: 40px;
+            display: inline;
+            list-style-type: none;
             padding: 5px;
             margin: 5px;
             overflow: hidden;
