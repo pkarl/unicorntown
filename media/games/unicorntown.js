@@ -283,7 +283,7 @@ window.game = {
 		var command_tokens = command.split(' ');
 
 		// if we don't know how to do it, we say so here.
-		if ( !_.has(game.commands, command_tokens[0]) ) {
+		if ( !~_.indexOf(game.state.commands, command_tokens[0]) ) {
 			return "<p>I don\'t know how to <span class='cmd'>" + command + "</span>.</p>";
 		}
 
