@@ -17,6 +17,24 @@ window.game = {
 			}
 		},
 
+		TEAR: {
+			value: 100,
+			description: "The tears of a unicorn. Some say they have healing powers.",
+			actions: {
+				HEAL: function(subject) {
+					// is the unicorn hurt?
+					// heal the unicorn
+				},
+				USE: function(subject) {
+					return game.items.TEAR.actions.HEAL(subject);
+				},
+				SELL: function() {
+					game.inventory.remove('TEAR');
+					game.inventory.pay(game.items.TEAR.value);
+				}
+			}
+		},
+
 		SUGARCUBE: {
 			value: 1,
 			description: "Mystical equines enjoy these sugary snacks."
@@ -67,10 +85,9 @@ window.game = {
 					return "<p>You don't have one of those." + (game.state.inventory.items().length ? " You can use these things: <span class='item'>" + game.state.inventory.items().join("</span>, </span class='item'>") + "</span>" : "") + "</p>";
 				}
 
-				// TODO: check for requiremens here
+				// TODO: check for requirements here
 
 				var subject = game.items[subjectName];
-
 				var msg = subject.actions.USE(subjectName);
 
 				return "<p>You use a <span class='item'>" + subjectName + "</span></p>" + msg; // need to replace this with parent prop. name
@@ -80,7 +97,23 @@ window.game = {
 			_startswith: true,
 			description: "<span class='cmd'>play</span> initiates a racous playtime with the unicorn. Loads of prancing. Be careful!",
 			action: function() {
+				var add_tears = false;
 				// change state
+				game.state.game._unicorn_play_count += 1;
+
+				if (game.state.game._unicorn_play_count > 3) {
+					if (Math.random() < 4/10) {
+						add_tears = true;
+					}
+				} else if (game.state.game._unicorn_play_count === 3) {
+					add_tears = true;
+				}
+
+				if (add_tears) {
+					game.state.inventory.add("TEAR");
+					return "<p>Oh no! While you were playing the unicorn fell and hurt itself!</p><p>You have gained a unicorn <span class='item'>TEAR</span>";	
+				}
+
 				return "<p>As the unicorn bounds through a field with you, flowers are kissed with glistening sunshine radiating from its gleaming horn. You have made the unicorn happy.</p>";
 			}
 		},
@@ -142,8 +175,8 @@ window.game = {
 				return;
 			},
 
-			add: function(item) {
-				return game.state.inventory._items.push(item);
+			add: function(item) { // TODO: finish property vs. lookup convo with MP
+				return game.state.inventory._items.push(item);	
 			},
 
 			pay: function(amount) {
@@ -217,6 +250,7 @@ window.game = {
 
 		game: {
 
+			_unicorn_play_count: 0, // have you played with the unicorn yet?
 			_has_sellable_item: false,
 			_tears_count: 0,	// # of tears drawn from unicorn
 			_hairs_count: 0,	// # of hairs plucked from unicorn
@@ -248,7 +282,7 @@ window.game = {
 		var command_tokens = command.split(' ');
 
 		// if we don't know how to do it, we say so here.
-		if ( !_.has(game.commands, command_tokens[0]) ) {
+		if ( !~_.indexOf(game.state.commands, command_tokens[0]) ) {
 			return "<p>I don\'t know how to <span class='cmd'>" + command + "</span>.</p>";
 		}
 
@@ -355,6 +389,14 @@ window.game = {
 			command = command.toUpperCase(); // this is thx to our key names being in UC
 
 			return command;
+		},
+		tmpl: {
+			item: function(itemName) {
+				return "<span class='item'>" + itemName + "</span>";
+			},
+			command: function(cmdName) {
+				return "<span class='cmd'>" + cmdName + "</span>";
+			}
 		}
 	}
 
