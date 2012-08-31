@@ -33,34 +33,6 @@ body {
             border: none;
         }
 
-    #unicorn-inventory {
-        text-align: left;
-        padding-bottom: 1em;
-    }
-        #unicorn-inventory p {
-            margin: 0;
-        }
-        .cash {
-            color: #0f0;
-            float: right;
-        }
-        #unicorn-inventory .items {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-        }
-        #unicorn-inventory .item {
-            background-color: #010;
-            color: #ff0;
-            display: inline;
-            list-style-type: none;
-            padding: 5px;
-            margin: 5px;
-            overflow: hidden;
-
-            text-transform: uppercase;
-        }
-
     #unicorn-messages {
         text-align: left;
         padding: 0 5% 5% 5%;
@@ -69,6 +41,8 @@ body {
         border-right: 1px solid #030;
         overflow: hidden;
         height: 100%;
+        width: 49%;
+        float: left;
     }
         #unicorn-messages p {
             padding: 0 0 1em 0;
@@ -94,3 +68,37 @@ body {
             opacity: 0.3;
         }
 
+    #unicorn-inventory {
+        text-align: left;
+        padding: 0 0 1em 0;
+        width: 40%;
+        float: left;
+    }
+        #unicorn-inventory p {
+            margin: 0.5em;
+        }
+        .cash {
+            /* hiding this until we have SELL */
+            display: none;
+            color: #0f0;
+            float: right;
+        }
+        #unicorn-inventory .items {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        #unicorn-inventory .item {
+            background-color: #010;
+            color: #ff0;
+            display: inline;
+            list-style-type: none;
+            padding: 5px;
+            margin: 5px;
+            overflow: hidden;
+            float: left;
+            margin: 0 0.5em 1em 0.5em;
+
+            font-size: 0.8em;
+            text-transform: uppercase;
+        }
