@@ -67,10 +67,9 @@ window.game = {
 					return "<p>You don't have one of those." + (game.state.inventory.items().length ? " You can use these things: <span class='item'>" + game.state.inventory.items().join("</span>, </span class='item'>") + "</span>" : "") + "</p>";
 				}
 
-				// TODO: check for requiremens here
+				// TODO: check for requirements here
 
 				var subject = game.items[subjectName];
-
 				var msg = subject.actions.USE(subjectName);
 
 				return "<p>You use a <span class='item'>" + subjectName + "</span></p>" + msg; // need to replace this with parent prop. name
