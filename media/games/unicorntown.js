@@ -17,7 +17,7 @@ window.game = {
 			}
 		},
 
-		TEARS: {
+		TEAR: {
 			value: 100,
 			description: "The tears of a unicorn. Some say they have healing powers.",
 			actions: {
@@ -26,11 +26,11 @@ window.game = {
 					// heal the unicorn
 				},
 				USE: function(subject) {
-					return game.items.TEARS.actions.HEAL(subject);
+					return game.items.TEAR.actions.HEAL(subject);
 				},
 				SELL: function() {
-					game.inventory.remove('TEARS');
-					game.inventory.pay += game.items.TEARS.value;
+					game.inventory.remove('TEAR');
+					game.inventory.pay += game.items.TEAR.value;
 				}
 			}
 		},
@@ -104,7 +104,7 @@ window.game = {
 				// is play_count 3
 				if (game.state.game._unicorn_play_count > 3) {
 					var tear_chance = Math.floor(Math.random() * (10 - 0 + 1)) + 0;
-					if (tear_chance >= 8) {
+					if (tear_chance >= 7) {
 						add_tears = true;
 					}
 				} else if (game.state.game._unicorn_play_count === 3) {
@@ -112,8 +112,8 @@ window.game = {
 				}
 
 				if (add_tears) {
-					game.state.inventory.add("TEARS");
-					return "<p>Oh no! While you were playing the unicorn hurt itself!</p><p>You have gained <span class='item'>TEARS</span>";	
+					game.state.inventory.add("TEAR");
+					return "<p>Oh no! While you were playing the unicorn fell and hurt itself!</p><p>You have gained a unicorn <span class='item'>TEAR</span>";	
 				}
 
 				return "<p>As the unicorn bounds through a field with you, flowers are kissed with glistening sunshine radiating from its gleaming horn. You have made the unicorn happy.</p>";
