@@ -17,6 +17,24 @@ window.game = {
 			}
 		},
 
+		TEARS: {
+			value: 100,
+			description: "The tears of a unicorn. Some say they have healing powers.",
+			actions: {
+				HEAL: function(subject) {
+					// is the unicorn hurt?
+					// heal the unicorn
+				},
+				USE: function(subject) {
+					return game.items.TEARS.actions.HEAL(subject);
+				},
+				SELL: function() {
+					game.inventory.remove('TEARS');
+					game.inventory.pay += game.items.TEARS.value;
+				}
+			}
+		},
+
 		SUGARCUBE: {
 			value: 1,
 			description: "Mystical equines enjoy these sugary snacks."
@@ -79,7 +97,25 @@ window.game = {
 			_startswith: true,
 			description: "<span class='cmd'>play</span> initiates a racous playtime with the unicorn. Loads of prancing. Be careful!",
 			action: function() {
+				var add_tears = false;
 				// change state
+				game.state.game._unicorn_play_count += 1;
+
+				// is play_count 3
+				if (game.state.game._unicorn_play_count > 3) {
+					var tear_chance = Math.floor(Math.random() * (10 - 0 + 1)) + 0;
+					if (tear_chance >= 8) {
+						add_tears = true;
+					}
+				} else if (game.state.game._unicorn_play_count === 3) {
+					add_tears = true;
+				}
+
+				if (add_tears) {
+					game.state.inventory.add("TEARS");
+					return "<p>Oh no! While you were playing the unicorn hurt itself!</p><p>You have gained <span class='item'>TEARS</span>";	
+				}
+
 				return "<p>As the unicorn bounds through a field with you, flowers are kissed with glistening sunshine radiating from its gleaming horn. You have made the unicorn happy.</p>";
 			}
 		},
@@ -141,8 +177,8 @@ window.game = {
 				return;
 			},
 
-			add: function(item) {
-				return game.state.inventory._items.push(item);
+			add: function(item) { // TODO: finish property vs. lookup convo with MP
+				return game.state.inventory._items.push(item);	
 			},
 
 			pay: function(amount) {
@@ -216,6 +252,7 @@ window.game = {
 
 		game: {
 
+			_unicorn_play_count: 0, // have you played with the unicorn yet?
 			_has_sellable_item: false,
 			_tears_count: 0,	// # of tears drawn from unicorn
 			_hairs_count: 0,	// # of hairs plucked from unicorn
@@ -354,6 +391,14 @@ window.game = {
 			command = command.toUpperCase(); // this is thx to our key names being in UC
 
 			return command;
+		},
+		tmpl: {
+			item: function(itemName) {
+				return "<span class='item'>" + itemName + "</span>";
+			},
+			command: function(cmdName) {
+				return "<span class='cmd'>" + cmdName + "</span>";
+			}
 		}
 	}
 
