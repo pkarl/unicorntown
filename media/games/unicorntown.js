@@ -101,9 +101,8 @@ window.game = {
 				// change state
 				game.state.game._unicorn_play_count += 1;
 
-				// is play_count 3
 				if (game.state.game._unicorn_play_count > 3) {
-					if (Math.random() < 4/11) {
+					if (Math.random() < 4/10) {
 						add_tears = true;
 					}
 				} else if (game.state.game._unicorn_play_count === 3) {
